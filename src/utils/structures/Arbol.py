@@ -1,114 +1,90 @@
-class Nodo_Arbol:
-    def __init__(self, dato):
-        self.dato = dato
-        self.izquierdo: Nodo_Arbol = None
-        self.derecho: Nodo_Arbol = None
+from typing import Callable, Self
 
-class Arbol:
-    def __init__(self):
-        self.raiz : Nodo_Arbol = None
-    
-    def pre_orden(self):
-        self.__pre_orden(self.raiz)
 
-    def __pre_orden(self, nodo):
-        if nodo is None:
-            return 
-        print(nodo.dato, end=" ")
-        self.__pre_orden(nodo.izquierdo)
-        self.__pre_orden(nodo.derecho)
+class NodoArbol[C, V]:
+    """Nodo para árbol binario de búsqueda"""
 
-    def in_orden(self):
-        self.__in_orden(self.raiz)
+    def __init__(self, clave: C, valor: V) -> None:
+        self.clave: C = clave
+        self.valor: V = valor
+        self.izquierdo: Self | None = None
+        self.derecho: Self | None = None
 
-    def __in_orden(self, nodo):
-        if nodo is None:
-            return 
-        self.__in_orden(nodo.izquierdo)
-        print(nodo.dato, end=" ")
-        self.__in_orden(nodo.derecho)
-    
-    def post_orden(self):
-        self.__post_orden(self.raiz)
 
-    def __post_orden(self, nodo):
-        if nodo is None:
-            return 
-        self.__post_orden(nodo.izquierdo)
-        self.__post_orden(nodo.derecho)
-        print(nodo.dato, end=" ")
+class ArbolBinarioBusqueda[C: int, V]:
+    """
+    Árbol binario de búsqueda
+    Usada para: Historial de pedidos ordenados por ID
+    """
 
-    def buscar(self, dato):
-        return self.__buscar(self.raiz, dato)
+    def __init__(self) -> None:
+        self.raiz: NodoArbol[C, V] | None = None
 
-    def __buscar(self, nodo: Nodo_Arbol, dato):
-        if nodo is None:
-            return False
-        
-        if dato == nodo.dato:
-            return True
-        
-        if dato < nodo.dato:
-            return self.__buscar(nodo.izquierdo, dato)
-        else:
-            return self.__buscar(nodo.derecho, dato) 
-
-    def buscar_iterativo(self, dato):
-        nodo = self.raiz
-        while nodo is not None:
-            if nodo.dato == dato:
-                return True
-            elif dato < nodo.dato:
-                nodo = nodo.izquierdo
-            else:
-                nodo = nodo.derecho
-        return False
-    
-    def insertar(self, dato):
+    def insertar(self, clave: C, valor: V) -> None:
+        """Inserta un nuevo nodo en el árbol"""
         if self.raiz is None:
-            self.raiz = Nodo_Arbol(dato)
+            self.raiz = NodoArbol(clave, valor)
         else:
-            self.__insertar(self.raiz, dato)
+            self._insertar_recursivo(self.raiz, clave, valor)
 
-    def __insertar(self, nodo, dato):
-        if dato < nodo.dato:
+    def _insertar_recursivo(self, nodo: NodoArbol[C, V], clave: C, valor: V) -> None:
+        """Inserción recursiva en el árbol"""
+        if clave < nodo.clave:
             if nodo.izquierdo is None:
-                nodo.izquierdo = Nodo_Arbol(dato)
+                nodo.izquierdo = NodoArbol(clave, valor)
             else:
-                self.__insertar(nodo.izquierdo, dato)
-        elif dato > nodo.dato:
+                self._insertar_recursivo(nodo.izquierdo, clave, valor)
+        else:
             if nodo.derecho is None:
-                nodo.derecho = Nodo_Arbol(dato)
+                nodo.derecho = NodoArbol(clave, valor)
             else:
-                self.__insertar(nodo.derecho, dato)
+                self._insertar_recursivo(nodo.derecho, clave, valor)
 
-    def eliminarPredecesor(self, dato):
-        self.raiz = self.__eliminarPredecesor(dato, self.raiz)
-    
-    def __eliminarPredecesor(self, dato, nodo):
+    def buscar(self, clave: C) -> V | None:
+        """Busca un valor por su clave"""
+        return self._buscar_recursivo(self.raiz, clave)
+
+    def _buscar_recursivo(self, nodo: NodoArbol[C, V] | None, clave: C) -> V | None:
+        """Búsqueda recursiva en el árbol"""
         if nodo is None:
-            return nodo
-        
-        if dato < nodo.dato:
-            nodo.izquierdo = self.__eliminarPredecesor(dato, nodo.izquierdo)
-        elif dato > nodo.dato:
-            nodo.derecho = self.__eliminarPredecesor(dato, nodo.derecho)
+            return None
+        if clave == nodo.clave:
+            return nodo.valor
+        elif clave < nodo.clave:
+            return self._buscar_recursivo(nodo.izquierdo, clave)
         else:
-            if nodo.izquiero is None and nodo.derecho is None:
-                return None
-            
-            if nodo.izquierdo is None:
-                return nodo.derecho
-            if nodo.derecho is None:
-                return nodo.izquierdo
-            
-            predecesor = self.__encontrarMaximo(nodo.izquierdo)
-            nodo.dato = predecesor.dato
-            nodo.izquierdo = self.__eliminarPredecesor(predecesor.dato, nodo.izquierdo)
+            return self._buscar_recursivo(nodo.derecho, clave)
 
-        return nodo
+    def recorrer_inorden(self) -> list[tuple[C, V]]:
+        """Recorrido inorden (izquierda-raíz-derecha)"""
+        resultado: list[tuple[C, V]] = []
+        self._inorden_recursivo(self.raiz, resultado)
+        return resultado
 
-    def __encontrarMaximo(self, nodo):
-        if nodo.derecho is None:
-            return nodo
-        return self.__encontrarMaximo(nodo.derecho)
+    def _inorden_recursivo(
+        self, nodo: NodoArbol[C, V] | None, resultado: list[tuple[C, V]]
+    ) -> None:
+        """Recorrido inorden recursivo"""
+        if nodo is not None:
+            self._inorden_recursivo(nodo.izquierdo, resultado)
+            resultado.append((nodo.clave, nodo.valor))
+            self._inorden_recursivo(nodo.derecho, resultado)
+
+    def filtrar_por_criterio(self, criterio: Callable[[V], bool]) -> list[V]:
+        """Filtra elementos del árbol según criterio"""
+        resultado: list[V] = []
+        self._filtrar_recursivo(self.raiz, criterio, resultado)
+        return resultado
+
+    def _filtrar_recursivo(
+        self,
+        nodo: NodoArbol[C, V] | None,
+        criterio: Callable[[V], bool],
+        resultado: list[V],
+    ) -> None:
+        """Filtrado recursivo"""
+        if nodo is not None:
+            self._filtrar_recursivo(nodo.izquierdo, criterio, resultado)
+            if criterio(nodo.valor):
+                resultado.append(nodo.valor)
+            self._filtrar_recursivo(nodo.derecho, criterio, resultado)
