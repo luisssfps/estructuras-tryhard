@@ -1,9 +1,4 @@
 class Grafo[T]:
-    """
-    Grafo no dirigido con pesos
-    Usada para: Mapa de la ciudad (zonas y conexiones)
-    """
-
     def __init__(self) -> None:
         self.vertices: dict[T, dict[T, float]] = {}
 

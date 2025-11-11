@@ -1,14 +1,9 @@
 class ColaPrioridad[T]:
-    """
-    Cola con prioridades para pedidos
-    Prioridad: 1 (alta) a 5 (baja)
-    """
-
     def __init__(self) -> None:
         self.items: list[tuple[int, T]] = []
 
     def encolar(self, item: T, prioridad: int = 3) -> None:
-        """Agrega elemento con prioridad (1=alta, 5=baja)"""
+        """Agrega elemento con prioridad"""
         self.items.append((prioridad, item))
         self.items.sort(key=lambda x: x[0])
 

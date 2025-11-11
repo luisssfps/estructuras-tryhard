@@ -2,19 +2,12 @@ from typing import Callable, Self
 
 
 class NodoSimple[T]:
-    """Nodo para lista simple"""
-
     def __init__(self, dato: T) -> None:
         self.dato: T = dato
         self.siguiente: Self | None = None
 
 
 class ListaSimple[T]:
-    """
-    Lista enlazada simple
-    Usada para: Registro de clientes
-    """
-
     def __init__(self) -> None:
         self.cabeza: NodoSimple[T] | None = None
         self.tamanio_lista: int = 0
@@ -77,3 +70,4 @@ class ListaSimple[T]:
 
     def tamanio(self) -> int:
         return self.tamanio_lista
+

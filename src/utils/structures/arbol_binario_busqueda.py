@@ -2,8 +2,6 @@ from typing import Callable, Self
 
 
 class NodoArbol[C, V]:
-    """Nodo para árbol binario de búsqueda"""
-
     def __init__(self, clave: C, valor: V) -> None:
         self.clave: C = clave
         self.valor: V = valor
@@ -12,11 +10,6 @@ class NodoArbol[C, V]:
 
 
 class ArbolBinarioBusqueda[C: int, V]:
-    """
-    Árbol binario de búsqueda
-    Usada para: Historial de pedidos ordenados por ID
-    """
-
     def __init__(self) -> None:
         self.raiz: NodoArbol[C, V] | None = None
 

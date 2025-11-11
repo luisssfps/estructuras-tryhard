@@ -2,8 +2,6 @@ from typing import Callable, Self
 
 
 class NodoDoble[T]:
-    """Nodo para lista doblemente ligada"""
-
     def __init__(self, dato: T) -> None:
         self.dato: T = dato
         self.siguiente: Self | None = None
@@ -11,11 +9,6 @@ class NodoDoble[T]:
 
 
 class ListaDoble[T]:
-    """
-    Lista doblemente enlazada
-    Usada para: Domiciliarios (permite retroceder y avanzar)
-    """
-
     def __init__(self) -> None:
         self.cabeza: NodoDoble[T] | None = None
         self.cola: NodoDoble[T] | None = None
