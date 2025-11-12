@@ -1,4 +1,4 @@
-from typing import Callable, Self
+from typing import Callable, Iterator, Self
 
 
 class NodoDoble[T]:
@@ -9,10 +9,29 @@ class NodoDoble[T]:
 
 
 class ListaDoble[T]:
-    def __init__(self) -> None:
+    def __init__(self, iter: Iterator[T] | None = None) -> None:
         self.cabeza: NodoDoble[T] | None = None
         self.cola: NodoDoble[T] | None = None
         self.tamanio_lista: int = 0
+        if iter is not None:
+            for dato in iter:
+                self.agregar_final(dato)
+
+    def esta_vacia(self) -> bool:
+        return self.cabeza is None
+
+    def agregar_principio(self, dato: T) -> None:
+        """Agrega elemento al final"""
+        nuevo_nodo = NodoDoble(dato)
+        if self.cola is None:
+            self.cola = nuevo_nodo
+            self.cabeza = nuevo_nodo
+        else:
+            nuevo_nodo.siguiente = self.cabeza
+            assert self.cabeza is not None
+            self.cabeza.anterior = nuevo_nodo
+            self.cabeza = nuevo_nodo
+        self.tamanio_lista += 1
 
     def agregar_final(self, dato: T) -> None:
         """Agrega elemento al final"""
@@ -27,7 +46,7 @@ class ListaDoble[T]:
             self.cola = nuevo_nodo
         self.tamanio_lista += 1
 
-    def eliminar(self, criterio: Callable[[T], bool]) -> bool:
+    def eliminar(self, criterio: Callable[[T], bool]) -> T | None:
         """Elimina elemento que cumpla el criterio"""
         actual = self.cabeza
         while actual is not None:
@@ -43,9 +62,9 @@ class ListaDoble[T]:
                     self.cola = actual.anterior
 
                 self.tamanio_lista -= 1
-                return True
+                return actual.dato
             actual = actual.siguiente
-        return False
+        return None
 
     def buscar(self, criterio: Callable[[T], bool]) -> T | None:
         """Busca elemento que cumpla el criterio"""
@@ -56,14 +75,15 @@ class ListaDoble[T]:
             actual = actual.siguiente
         return None
 
-    def listar_todos(self) -> list[T]:
-        """Retorna todos los elementos como lista"""
-        resultado: list[T] = []
+    def __iter__(self) -> Iterator[T]:
+        """Retorna todos los elementos como un iterador"""
         actual = self.cabeza
         while actual is not None:
-            resultado.append(actual.dato)
+            yield actual.dato
             actual = actual.siguiente
-        return resultado
 
-    def tamanio(self) -> int:
+    def __len__(self) -> int:
         return self.tamanio_lista
+
+    def __contains__(self, item):
+        return self.buscar(lambda x: x == item) is not None
