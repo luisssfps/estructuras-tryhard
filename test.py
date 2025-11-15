@@ -7,6 +7,6 @@ if __name__ == "__main__":
         tests.test_lista_doble()
         tests.test_grafo()
         tests.test_arbol_binario_busqueda()
+        print("\nTests completados correctamente")
     except Exception as e:
-        print(e.__cause__)
-    print("\nTests completados correctamente")
+        print(e)
