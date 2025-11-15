@@ -118,37 +118,40 @@ class ArbolBinarioBusqueda[C: Comparable, V]:
 
     def eliminar(self, clave: C) -> None:
         """Elimina un nodo del árbol por su clave"""
-        self.raiz = self._eliminar_recursivo(self.raiz, clave)
+        self.raiz, was_deleted = self._eliminar_recursivo(self.raiz, clave)
+        if was_deleted:
+            self.peso -= 1
 
     def _eliminar_recursivo(
         self, nodo: NodoArbol[C, V] | None, clave: C
-    ) -> NodoArbol[C, V] | None:
+    ) -> tuple[NodoArbol[C, V] | None, bool]:
         """Eliminación recursiva de un nodo"""
         if nodo is None:
-            return None
+            return None, False
 
+        was_deleted = False
         # Buscar el nodo a eliminar
         if clave < nodo.clave:
-            nodo.izquierdo = self._eliminar_recursivo(nodo.izquierdo, clave)
+            nodo.izquierdo, was_deleted = self._eliminar_recursivo(nodo.izquierdo, clave)
         elif clave > nodo.clave:
-            nodo.derecho = self._eliminar_recursivo(nodo.derecho, clave)
+            nodo.derecho, was_deleted = self._eliminar_recursivo(nodo.derecho, clave)
         else:
-            self.peso -= 1
+            was_deleted = True
             # Caso 1: nodo sin hijos
             if nodo.izquierdo is None and nodo.derecho is None:
-                return None
+                return None, was_deleted
             # Caso 2: nodo con un solo hijo
             elif nodo.izquierdo is None:
-                return nodo.derecho
+                return nodo.derecho, was_deleted
             elif nodo.derecho is None:
-                return nodo.izquierdo
+                return nodo.izquierdo, was_deleted
             # Caso 3: nodo con dos hijos
             else:
                 sucesor = self._encontrar_minimo(nodo.derecho)
                 nodo.clave, nodo.valor = sucesor.clave, sucesor.valor
-                nodo.derecho = self._eliminar_recursivo(nodo.derecho, sucesor.clave)
+                nodo.derecho, _ = self._eliminar_recursivo(nodo.derecho, sucesor.clave)
 
-        return nodo
+        return nodo, was_deleted
 
     def claves(self) -> ListaDoble[C]:
         return ListaDoble(clave for clave, _ in self.recorrer_inorden())
